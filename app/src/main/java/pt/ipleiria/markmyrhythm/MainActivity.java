@@ -1,6 +1,5 @@
 package pt.ipleiria.markmyrhythm;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -35,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+
         signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         nameAcct = findViewById(R.id.nameAcct);
@@ -56,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         acct = GoogleSignIn.getLastSignedInAccount(this);
 
+        //Singleton
+        Singleton.getInstance().setGoogleSignClient(mGoogleSignInClient);
+        Singleton.getInstance().setGoogleAccount(acct);
+
+
         if (acct != null) {
             setGooglePlusButtonText(signInButton,"Sign out");
             String personName = acct.getDisplayName();
@@ -74,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
             imgAcct.setImageBitmap(null);
             mGoogleSignInClient.signOut();
             acct = null;
+            Singleton.getInstance().setGoogleSignClient(mGoogleSignInClient);
+            Singleton.getInstance().setGoogleAccount(acct);
             setGooglePlusButtonText(signInButton,"Sign in");
             nameAcct.setText("");
         }
@@ -90,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
             mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
             setGooglePlusButtonText(signInButton,"Sign out");
             acct = GoogleSignIn.getLastSignedInAccount(this);
+
+            Singleton.getInstance().setGoogleSignClient(mGoogleSignInClient);
+            Singleton.getInstance().setGoogleAccount(acct);
+
             String personName = acct.getDisplayName();
             Uri personPhoto = Uri.parse(String.valueOf(acct.getPhotoUrl()));
             Picasso.get().load(personPhoto).transform(new CropSquareTransformation()).into(imgAcct);
@@ -128,4 +140,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void newChallengeOnClick(View view) {
+        Intent i = new Intent(MainActivity.this, NewChallengeActivity.class);
+        startActivity(i);
+    }
 }
