@@ -10,95 +10,108 @@
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="70dp"
-        android:layout_marginStart="70dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginEnd="136dp"
+        android:layout_marginLeft="137dp"
+        android:layout_marginRight="136dp"
+        android:layout_marginStart="137dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/emailAcct">
 
     </com.google.android.gms.common.SignInButton>
 
 
     <TextView
         android:id="@+id/nameAcct"
-        android:layout_width="200dp"
-        android:layout_height="15dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="16dp"
         android:autoSizeTextType="uniform"
         android:text="Hello World!"
-        android:textAlignment="center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imgAcct"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imgAcct"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginStart="30dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="58dp"
+        android:layout_marginStart="58dp"
         android:layout_marginTop="16dp"
         android:visibility="visible"
-        app:layout_constraintStart_toEndOf="@+id/nameAcct"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/buttonNewChallenge"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/emailAcct"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="123dp"
-        android:layout_marginLeft="124dp"
-        android:layout_marginRight="123dp"
-        android:layout_marginStart="124dp"
-        android:layout_marginTop="56dp"
-        android:onClick="newChallengeOnClick"
-        android:text="New Challenge"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imgAcct"
         app:layout_constraintTop_toBottomOf="@+id/nameAcct" />
 
     <Button
-        android:id="@+id/button3"
-        android:layout_width="88dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
+        android:id="@+id/buttonNewChallenge"
+        android:layout_width="161dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="111dp"
+        android:layout_marginLeft="112dp"
+        android:layout_marginRight="111dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="28dp"
+        android:background="@color/colorPrimary"
+        android:drawableLeft="@drawable/ic_action_new_challenge"
+        android:onClick="newChallengeOnClick"
+        android:text="New Challenge"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
+
+    <Button
+        android:id="@+id/buttonHistory"
+        android:layout_width="161dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="111dp"
+        android:layout_marginLeft="112dp"
+        android:layout_marginRight="111dp"
+        android:layout_marginStart="112dp"
         android:layout_marginTop="16dp"
-        android:text="Button"
+        android:background="@android:color/holo_green_dark"
+        android:text="History"
+        android:textColor="@android:color/white"
+        android:textColorLink="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonNewChallenge" />
 
     <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
+        android:id="@+id/button3"
+        android:layout_width="161dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="111dp"
+        android:layout_marginLeft="112dp"
+        android:layout_marginRight="111dp"
+        android:layout_marginStart="112dp"
         android:layout_marginTop="16dp"
-        android:text="Button"
+        android:background="@android:color/holo_blue_dark"
+        android:text="Iniciar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
-
-    <Button
-        android:id="@+id/button5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="16dp"
-        android:text="Button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button4" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonHistory" />
 
 
 </android.support.constraint.ConstraintLayout>
