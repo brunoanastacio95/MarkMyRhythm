@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     // Set the dimensions of the sign-in button.
     private GoogleSignInAccount acct;
     private TextView nameAcct;
+    private TextView emailAcct;
     private ImageView imgAcct;
 
     @Override
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         nameAcct = findViewById(R.id.nameAcct);
         nameAcct.setText("");
+        emailAcct = findViewById(R.id.emailAcct);
+        emailAcct.setText("");
         imgAcct = findViewById(R.id.imgAcct);
 
 
@@ -65,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
         if (acct != null) {
             setGooglePlusButtonText(signInButton,"Sign out");
             String personName = acct.getDisplayName();
+            String email = acct.getEmail();
             Uri personPhoto = acct.getPhotoUrl();
             Picasso.get().load(personPhoto).transform(new CropSquareTransformation()).into(imgAcct);
             nameAcct.setText(personName);
+            emailAcct.setText(email);
         }
 
     }
@@ -84,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
             Singleton.getInstance().setGoogleAccount(acct);
             setGooglePlusButtonText(signInButton,"Sign in");
             nameAcct.setText("");
+            emailAcct.setText("");
         }
     }
 
@@ -103,9 +109,11 @@ public class MainActivity extends AppCompatActivity {
             Singleton.getInstance().setGoogleAccount(acct);
 
             String personName = acct.getDisplayName();
+            String email = acct.getEmail();
             Uri personPhoto = Uri.parse(String.valueOf(acct.getPhotoUrl()));
             Picasso.get().load(personPhoto).transform(new CropSquareTransformation()).into(imgAcct);
             nameAcct.setText(personName);
+            emailAcct.setText(email);
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
