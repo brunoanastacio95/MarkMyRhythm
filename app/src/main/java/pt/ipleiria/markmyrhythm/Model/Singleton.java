@@ -19,6 +19,7 @@ public class Singleton {
     private GoogleSignInClient googleSignClient;
     private GoogleSignInAccount googleAccount;
     private LinkedList<Route> routes;
+    private int lastActivityHour = -1;
 
     public LinkedList<Route> getRoutes() {
         return routes;
@@ -40,5 +41,13 @@ public class Singleton {
     }
     public void setGoogleSignClient (GoogleSignInClient googleClient){
         this.googleSignClient = googleClient;
+    }
+
+    public int getLastActivityHour() {
+        return lastActivityHour;
+    }
+
+    public void setLastActivityHour(int lastActivityHour) {
+        this.lastActivityHour = lastActivityHour;
     }
 }

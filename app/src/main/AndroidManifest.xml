@@ -37,7 +37,8 @@
             android:label="@string/title_activity_maps" />
         <activity android:name=".Activitty.Fragment.Fragment2"></activity>
 
-
+        <receiver android:name=".Model.AlarmReceiver" />
+        <receiver android:name=".Model.NotificationAlarm" />
     </application>
 
 </manifest>

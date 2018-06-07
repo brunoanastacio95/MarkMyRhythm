@@ -90,13 +90,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
+import pt.ipleiria.markmyrhythm.Model.AlarmReceiver;
+import pt.ipleiria.markmyrhythm.Model.NotificationAlarm;
+import pt.ipleiria.markmyrhythm.Model.Singleton;
 import pt.ipleiria.markmyrhythm.Util.CircleAdapter;
 import pt.ipleiria.markmyrhythm.R;
 
 
 public class NewChallengeActivity extends AppCompatActivity {
 
-    private static final String CHANNEL_ID = "sdas" ;
     static float t = 0;
     private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1;
     private static final String FENCE_RECEIVER_ACTION = "FENCE_RECEIVER_ACTION";
@@ -125,14 +127,12 @@ public class NewChallengeActivity extends AppCompatActivity {
     private static int hourMaxActivity;
     private static float maxActivity;
 
-    private PendingIntent myPendingIntent;
-    private FenceReceiver fenceReceiver;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_challenge);
+
+        AlarmReceiver.getInstance().scheduleAlarm(this, 24);
 
         distanceText = findViewById(R.id.textViewDistance);
         tempText = findViewById(R.id.textViewTemp);
@@ -149,12 +149,6 @@ public class NewChallengeActivity extends AppCompatActivity {
         longitude = -1000;
         contHour = 0;
         maxActivity = 0;
-
-        Intent i = new Intent(FENCE_RECEIVER_ACTION);
-        myPendingIntent = PendingIntent.getBroadcast(this, 0, i, 0);
-        fenceReceiver = new FenceReceiver();
-        registerReceiver(fenceReceiver, new IntentFilter(FENCE_RECEIVER_ACTION));
-
 
         checkFineLocationPermission();
         if (ContextCompat.checkSelfPermission(NewChallengeActivity.this,
@@ -175,19 +169,11 @@ public class NewChallengeActivity extends AppCompatActivity {
             allowFitnessOptions(dataTypeDistance);
             accessGoogleFit(dataTypeDistance, dataTypeDistanceAggregate);
             accessGoogleFitForChallenge();
-            getHourActivityLastWeek(dataTypeDistance, dataTypeDistanceAggregate);
-            addFenceTime();
+ //           getHourActivityLastWeek(dataTypeDistance, dataTypeDistanceAggregate);
         } else {
             Toast.makeText(NewChallengeActivity.this,
                     "Error: no network connection.", Toast.LENGTH_LONG).show();
         }
-
-      /*  Intent i = new Intent(FENCE_RECEIVER_ACTION);
-        myPendingIntent = PendingIntent.getBroadcast(this, 0, i, 0);
-        AlarmReceiver a = new AlarmReceiver();
-        registerReceiver(a, new IntentFilter(FENCE_RECEIVER_ACTION));
-        a.scheduleAlarm(this,1);
-*/
 
     }
 
@@ -205,36 +191,6 @@ public class NewChallengeActivity extends AppCompatActivity {
         }
     }
 
-    private void addFenceTime() {
-        long nowMillis = System.currentTimeMillis();
-        long oneMinuteMilis = 60L * 1000L;
-        long thirtySecondsMillis = 30L * 1000L;
-        AwarenessFence timeFence = TimeFence.inInterval(
-                nowMillis + thirtySecondsMillis,
-                nowMillis + oneMinuteMilis); // one minute starting in thirty seconds
-        addFence("timeFence", timeFence);
-    }
-
-
-
-    private void addFence(final String fenceKey, final AwarenessFence fence) {
-        Awareness.getFenceClient(this).updateFences(new FenceUpdateRequest.Builder()
-                .addFence(fenceKey, fence, myPendingIntent)
-                .build())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                })
-        ;
-    }
 
     private void accessGoogleFit(DataType fieldNormal, DataType fieldAggregate) {
         Calendar cal = Calendar.getInstance();
@@ -346,7 +302,7 @@ public class NewChallengeActivity extends AppCompatActivity {
 
     }
 
-    private void getHourActivityLastWeek(DataType fieldNormal, DataType fieldAggregate) {
+    public void getHourActivityLastWeek(DataType fieldNormal, DataType fieldAggregate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
@@ -370,13 +326,43 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(NewChallengeActivity.this,
-                        "Error: ",
-                        Toast.LENGTH_LONG).show();
+            /*    Toast.makeText(NewChallengeActivity.this, "Error: ", Toast.LENGTH_LONG).show();*/
             }
         });
+    }
 
+    public static void getHourActivityLastWeek_2(final Context context) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int currentHour = cal.get(Calendar.HOUR_OF_DAY);
+        cal.add(Calendar.HOUR, -currentHour);
+        cal.add(Calendar.DAY_OF_MONTH, -6);
+        long endTime = cal.getTimeInMillis();
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        long startTime = cal.getTimeInMillis();
 
+        DataType fieldNormal = DataType.TYPE_DISTANCE_DELTA;
+        DataType fieldAggregate = DataType.AGGREGATE_DISTANCE_DELTA;
+       
+        Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context)).readData(
+                new DataReadRequest.Builder()
+                        .aggregate(fieldNormal, fieldAggregate)
+                        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                        .bucketByTime(1, TimeUnit.HOURS)
+                        .build()).
+                addOnSuccessListener(new OnSuccessListener<DataReadResponse>() {
+                    @Override
+                    public void onSuccess(DataReadResponse dataReadResponse) {
+                        printData(dataReadResponse);
+                        // validar se o tempo é válido
+                        NotificationAlarm.getInstance().scheduleAlarm(context);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("DEBUG", "Error in get history");
+            }
+        });
     }
 
     private Boolean checkIfGoalsCompleted() {
@@ -411,10 +397,6 @@ public class NewChallengeActivity extends AppCompatActivity {
     }
 
     public static void printData(DataReadResponse dataReadResult) {
-        // [START parse_read_data_result]
-        // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
-        // as buckets containing DataSets, instead of just DataSets.
-
 
         if (dataReadResult.getBuckets().size() == 1) {
             Log.i(
@@ -425,7 +407,6 @@ public class NewChallengeActivity extends AppCompatActivity {
                     dumpDataSet(dataSet);
                 }
             }
-
         } else if (dataReadResult.getBuckets().size() > 1) {
 
             Log.i(LOG_TAG, "Number of returned DataSets is: " + dataReadResult.getDataSets().size());
@@ -436,7 +417,8 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
                 contHour++;
             }
-            System.out.println("PUTAS MAX" + maxActivity + "HORAS" + hourMaxActivity);
+            System.out.println("MAX ACTIVITY: " + maxActivity + " HORAS: " + hourMaxActivity);
+            Singleton.getInstance().setLastActivityHour(hourMaxActivity);
         }
 
         // [END parse_read_data_result]
@@ -476,7 +458,6 @@ public class NewChallengeActivity extends AppCompatActivity {
     private static void dumpDataSetForChallenge(DataSet dataSet) {
         Log.i(LOG_TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
 
-
         for (DataPoint dp : dataSet.getDataPoints()) {
             Log.i(LOG_TAG, "Data point:");
             Log.i(LOG_TAG, "\tType: " + dp.getDataType().getName());
@@ -507,7 +488,6 @@ public class NewChallengeActivity extends AppCompatActivity {
     }
 
     private static void dumpDataSetForHourActivity(DataSet dataSet) {
-
         Log.i(LOG_TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         for (DataPoint dp : dataSet.getDataPoints()) {
 
@@ -519,10 +499,9 @@ public class NewChallengeActivity extends AppCompatActivity {
                     maxActivity = dp.getValue(field).asFloat();
                     hourMaxActivity = contHour;
                 }
-                System.out.println("PUTAS" + dp.getValue(field) + "HORAS" + contHour);
+                System.out.println("PUTAS " + dp.getValue(field) + " HORAS " + contHour);
             }
         }
-
     }
 
     private void getCoordinatesAndDesc() {
@@ -643,144 +622,5 @@ public class NewChallengeActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(fenceReceiver);
-    }
 
-    private class FenceReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            if (!intent.getAction().equals(FENCE_RECEIVER_ACTION)) {
-                return;
-            }
-            FenceState fenceState = FenceState.extract(intent);
-            String fenceInfo = null;
-            switch (fenceState.getFenceKey()) {
-                case "timeFence":
-                    switch (fenceState.getCurrentState()) {
-                        case FenceState.TRUE:
-                            fenceInfo = "TRUE | Within timeslot.";
-                            System.out.println("entrei");
-                           // createNotificationChannel();
-                           // createNotification();
-                            break;
-                        case FenceState.FALSE:
-                            fenceInfo = "FALSE | Out of timeslot.";
-                            System.out.println("entrei false");
-                            break;
-                        case FenceState.UNKNOWN:
-                            fenceInfo = "Error: unknown state.";
-                            break;
-                    }
-                    break;
-                default:
-                    fenceInfo = "Error: unknown fence: " + fenceState.getFenceKey();
-                    break;
-            }
-
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            String text = "\n\n[Fences @ " + timestamp + "]\n"
-                    + fenceState.getFenceKey() + ": " + fenceInfo;
-
-            Toast.makeText(NewChallengeActivity.this,
-                    "DISPAREII", Toast.LENGTH_LONG).show();
-        }
-
-
-    }
-
-    public  class AlarmReceiver extends BroadcastReceiver
-    {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            if (!intent.getAction().equals(FENCE_RECEIVER_ACTION)) {
-                return;
-            }
-            System.out.println("FIRRRRREEEEEE");
-            //Wake up every 6 hours
-            //createNotificationChannel();
-            //createNotification();
-            scheduleAlarm(context, 6);
-            Toast.makeText(context, "ALARM FIRED !!!", Toast.LENGTH_SHORT).show();
-        }
-
-        /**
-         * Schedule Alarm in the specified time after the current time
-         * @param context Application Context
-         * @param hours Hours after the current time is going to ring the Alarm
-         */
-        public void scheduleAlarm(Context context, int hours)
-        {
-            System.out.println("FOOOOOOK");
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            System.out.println("1");
-            System.out.println(calendar.getTimeInMillis());
-            calendar.add(Calendar.MILLISECOND, 5000); // Hour-DAY
-            System.out.println("2");
-            System.out.println(calendar.getTimeInMillis());
-            // Actual time plus y + hour in milliseconds
-            // long millis = System.currentTimeMillis() + (hours * 1000) ; //* 60 * 60
-
-            Intent intentAlarm = new Intent(context, AlarmReceiver.class);
-            // Get the Alarm Service.
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            if(alarmManager != null){
-                System.out.println("LEEEEELLLLL");
-                // Set the alarm for a particular time.
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 30*1000,PendingIntent.getBroadcast(context, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT) );
-                // alarmManager.set(AlarmManager.RTC_WAKEUP, millis, PendingIntent.getBroadcast(context, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
-            }
-            Log.i("Alarm Scheduled", "Alarm Scheduled");
-        }
-
-
-    }
-    private void createNotification(){
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(NewChallengeActivity.this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_run)
-                .setContentTitle("My notification")
-                .setContentText("Much longer text that cannot fit one line...")
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("Much longer text that cannot fit one line..."))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        Intent resultIntent = new Intent(NewChallengeActivity.this, NewChallengeActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(NewChallengeActivity.this);
-        stackBuilder.addParentStack(NewChallengeActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0, PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Random r = new Random();
-        int a = r.nextInt((100-10)+1)+10;
-        mNotificationManager.notify(a, mBuilder.build());
-    }
-
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //CharSequence name = getString(R.string.channel_name);
-            //String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "MarkMyRhythmChannel", importance);
-            channel.setDescription("MarkMyRhythmChannel");
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
 }
