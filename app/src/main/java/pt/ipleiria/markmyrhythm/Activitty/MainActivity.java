@@ -1,12 +1,18 @@
-package pt.ipleiria.markmyrhythm;
+package pt.ipleiria.markmyrhythm.Activitty;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -16,6 +22,13 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
+
+import java.util.LinkedList;
+
+import pt.ipleiria.markmyrhythm.Model.Route;
+import pt.ipleiria.markmyrhythm.Util.CropSquareTransformation;
+import pt.ipleiria.markmyrhythm.Model.Singleton;
+import pt.ipleiria.markmyrhythm.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,14 +41,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView nameAcct;
     private TextView emailAcct;
     private ImageView imgAcct;
+    private static final int REQUEST_CODE_FLPERMISSION = 20;
+    private LinkedList<Route> routes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-
 
         signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -44,14 +56,13 @@ public class MainActivity extends AppCompatActivity {
         emailAcct = findViewById(R.id.emailAcct);
         emailAcct.setText("");
         imgAcct = findViewById(R.id.imgAcct);
-
+        routes = new LinkedList<>();
 
         signInButton.setOnClickListener(new SignInButton.OnClickListener() {
             public void onClick(View v) {
                 signIn();
             }
         });
-
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -63,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         //Singleton
         Singleton.getInstance().setGoogleSignClient(mGoogleSignInClient);
         Singleton.getInstance().setGoogleAccount(acct);
+        checkFineLocationPermission();
 
 
         if (acct != null) {
@@ -74,7 +86,14 @@ public class MainActivity extends AppCompatActivity {
             nameAcct.setText(personName);
             emailAcct.setText(email);
         }
+        addRoutes();
 
+    }
+
+    private void addRoutes() {
+        routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
+        routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
+        Singleton.getInstance().setRoutes(routes);
     }
 
     private void signIn() {
@@ -90,6 +109,29 @@ public class MainActivity extends AppCompatActivity {
             setGooglePlusButtonText(signInButton,"Sign in");
             nameAcct.setText("");
             emailAcct.setText("");
+        }
+    }
+    private void checkFineLocationPermission() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FLPERMISSION
+            );
+        }
+        try {
+            int locationMode = Settings.Secure.getInt(getContentResolver(),
+                    Settings.Secure.LOCATION_MODE);
+            if (locationMode != Settings.Secure.LOCATION_MODE_HIGH_ACCURACY) {
+                Toast.makeText(this,
+                        "Error: high accuracy location mode must be enabled in the device.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            Toast.makeText(this, "Error: could not access location mode.",
+                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return;
         }
     }
 

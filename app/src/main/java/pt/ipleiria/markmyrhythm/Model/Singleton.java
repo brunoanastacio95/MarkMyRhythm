@@ -1,8 +1,10 @@
-package pt.ipleiria.markmyrhythm;
+package pt.ipleiria.markmyrhythm.Model;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
+import java.util.LinkedList;
 
 public class Singleton {
     private static final Singleton ourInstance = new Singleton();
@@ -16,6 +18,15 @@ public class Singleton {
             .build();
     private GoogleSignInClient googleSignClient;
     private GoogleSignInAccount googleAccount;
+    private LinkedList<Route> routes;
+
+    public LinkedList<Route> getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(LinkedList<Route> routes) {
+        this.routes = routes;
+    }
 
     public GoogleSignInAccount getGoogleAccount() {
         return googleAccount;

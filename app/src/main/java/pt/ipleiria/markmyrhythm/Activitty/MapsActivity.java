@@ -1,10 +1,9 @@
-package pt.ipleiria.markmyrhythm;
+package pt.ipleiria.markmyrhythm.Activitty;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +18,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
@@ -39,12 +37,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import pt.ipleiria.markmyrhythm.Model.Route;
+import pt.ipleiria.markmyrhythm.Model.Singleton;
+import pt.ipleiria.markmyrhythm.R;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Double longitude;
     private Double latitude;
     private static final int REQUEST_CODE_FLPERMISSION = 20;
+    private LinkedList<Route> routes;
 
 
     @Override
@@ -52,15 +55,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Bundle extras = getIntent().getExtras();
-        latitude = (Double) extras.get("latitude");
-        longitude = (Double) extras.get("longitude");
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
+        latitude = (Double) extras.get("latitude");
+        longitude = (Double) extras.get("longitude");
+        String firstLocation = latitude + "," + longitude;
 
+        routes = Singleton.getInstance().getRoutes();
+
+        for (int i = 0;i < routes.size();i++){
+            System.out.println("caralo");
+            DistanceBetweenTwoPoints distanceBetweenTwoPoints = new DistanceBetweenTwoPoints();
+            distanceBetweenTwoPoints.execute("https://maps.googleapis.com/maps/api" +
+                    "/distancematrix/json?origins=" + firstLocation + "&destinations="+routes.get(i).getStart() +
+                    "&mode=walking&key=AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
+
+        }
+
+    }
 
     /**
      * Manipulates the map once available.
@@ -97,9 +110,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         FetchUrl distanceBetweenTwoPoints = new FetchUrl();
          distanceBetweenTwoPoints.execute("https://maps.googleapis.com/maps/api/directions/json?" +
-              "origin="+myLocation.latitude+","+myLocation.longitude+"&destination="+myLocation2.latitude+","+myLocation2.longitude+"&avoid=highways&mode=walking&key=" +
+              "origin="+39.6010749+","+-8.8128075+"&destination="+39.5986332+","+-8.8158281+
+                 "&waypoints="+39.6002813+","+-8.8151356+"|"+39.6000728+","+-8.8131588+
+                 "&avoid=highways&mode=walking&key=" +
                 "AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
-      //  https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=YOUR_API_KEY
 
     }
 
@@ -194,7 +208,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return data;
         }
     }
-
 
     class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
@@ -358,4 +371,66 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+}
+
+class DistanceBetweenTwoPoints extends AsyncTask<String, Void, String> {
+
+    @SuppressLint("LongLogTag")
+    @Override
+    protected String doInBackground(String... urls) {
+
+        try {
+            // establish the connection to the network resource
+            URL url = new URL(urls[0]);
+            HttpURLConnection httpURLConnection =
+                    (HttpURLConnection) url.openConnection();
+            httpURLConnection.setReadTimeout(10000);
+            httpURLConnection.setConnectTimeout(15000);
+            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.connect();
+            int responseCode = httpURLConnection.getResponseCode();
+            Log.i("Google Api Distance Matrix", "HTTP response code: " + responseCode);
+            //retrieve the network resource's content
+            InputStream inputStream = httpURLConnection.getInputStream();
+            String contentAsString = readStream(inputStream);
+            inputStream.close();
+            return contentAsString;
+        } catch (IOException e) {
+            return "ERROR: unable to retrieve web page. URL may be invalid.";
+        }
+    }
+
+    @Override
+    protected void onPostExecute(String result) {
+        if (!result.startsWith("ERROR")) {
+            JSONObject distance = new JSONObject();
+            try {
+                distance = new JSONObject(result);
+                JSONArray ola = distance.getJSONArray("rows");
+                System.out.println("RESULT" + ola.getJSONObject(0).getJSONArray("elements")
+                        .getJSONObject(0).getJSONObject("distance").getString("value"));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+
+            //Toast.makeText(MapsActivity.this, result, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String readStream(InputStream is) {
+        StringBuilder sb = new StringBuilder(512);
+        try {
+            Reader r = new InputStreamReader(is, "UTF-8");
+            int c = 0;
+            while ((c = r.read()) != -1) {
+                sb.append((char) c);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return sb.toString();
+    }
 }

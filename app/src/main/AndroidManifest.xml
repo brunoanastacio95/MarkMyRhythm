@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,14 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activitty.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewChallengeActivity" />
+        <activity android:name=".Activitty.NewChallengeActivity" />
 
         <meta-data
             android:name="com.google.android.awareness.API_KEY"
@@ -31,9 +33,11 @@
             android:value="AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".Activitty.MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".Fragment2"></activity>
+        <activity android:name=".Activitty.Fragment.Fragment2"></activity>
+
+
     </application>
 
 </manifest>

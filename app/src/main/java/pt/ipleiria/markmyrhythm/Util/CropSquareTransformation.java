@@ -1,4 +1,4 @@
-package pt.ipleiria.markmyrhythm;
+package pt.ipleiria.markmyrhythm.Util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

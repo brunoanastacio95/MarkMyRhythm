@@ -1,4 +1,4 @@
-package pt.ipleiria.markmyrhythm;
+package pt.ipleiria.markmyrhythm.Activitty.Fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import pt.ipleiria.markmyrhythm.R;
 
-@SuppressLint("NewApi")
+
 public class Fragment2 extends Fragment {
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_new_challenge_act2, container, false);
     }
 }
