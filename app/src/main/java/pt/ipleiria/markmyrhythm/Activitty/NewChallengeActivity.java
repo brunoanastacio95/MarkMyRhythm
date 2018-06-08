@@ -24,6 +24,7 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -78,6 +79,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLOutput;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -101,9 +103,6 @@ public class NewChallengeActivity extends AppCompatActivity {
 
     static float t = 0;
     private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1;
-    private static final String FENCE_RECEIVER_ACTION = "FENCE_RECEIVER_ACTION";
-
-    private static final String LOG_TAG = "DEBUGTAG";
     private static final int REQUEST_CODE_FLPERMISSION = 20;
     private static float distance = 0;
     private static int calories = 0;
@@ -120,27 +119,37 @@ public class NewChallengeActivity extends AppCompatActivity {
     private String locationDesc;
     private ImageView imageCondtions;
     private ImageView imageSport;
+    private ImageView imagePlus;
+    private ImageView imageEqual;
+    private ImageView imageProgress;
     private TextView textChallenge;
     private Button btnAcceptChallenge;
     private ArrayList<pt.ipleiria.markmyrhythm.Model.Goal> goals;
     private static int contHour;
     private static int hourMaxActivity;
     private static float maxActivity;
+    private static View view;
+    private static String dayName;
+    private boolean isRainning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_challenge);
 
-        AlarmReceiver.getInstance().scheduleAlarm(this, 24);
+       // AlarmReceiver.getInstance().scheduleAlarm(this, 24);
 
         distanceText = findViewById(R.id.textViewDistance);
         tempText = findViewById(R.id.textViewTemp);
         imageCondtions = findViewById(R.id.imageViewConditions);
         imageCondtions.setImageResource(R.drawable.ic_rainny_day);
         imageSport = findViewById(R.id.imageViewSport);
+        imagePlus = findViewById(R.id.imageViewPlus);
+        imageEqual = findViewById(R.id.imageViewEqual);
+        imageProgress = findViewById(R.id.imageViewProgress);
         textChallenge = findViewById(R.id.textViewChallenge);
         btnAcceptChallenge = findViewById(R.id.buttonShowChallenge);
+        view = findViewById(android.R.id.content);
 
         goals = new ArrayList<>();
         conditions = new LinkedList<>();
@@ -149,6 +158,7 @@ public class NewChallengeActivity extends AppCompatActivity {
         longitude = -1000;
         contHour = 0;
         maxActivity = 0;
+        isRainning = false;
 
         checkFineLocationPermission();
         if (ContextCompat.checkSelfPermission(NewChallengeActivity.this,
@@ -159,7 +169,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-        if (networkInfo != null && networkInfo.isConnected() && GoogleSignIn.getLastSignedInAccount(this) != null) {
+        if (networkInfo != null && networkInfo.isConnected()) {
             DataType dataTypeDistance = DataType.TYPE_DISTANCE_DELTA;
             DataType dataTypeDistanceAggregate = DataType.AGGREGATE_DISTANCE_DELTA;
 
@@ -169,10 +179,15 @@ public class NewChallengeActivity extends AppCompatActivity {
             allowFitnessOptions(dataTypeDistance);
             accessGoogleFit(dataTypeDistance, dataTypeDistanceAggregate);
             accessGoogleFitForChallenge();
- //           getHourActivityLastWeek(dataTypeDistance, dataTypeDistanceAggregate);
         } else {
-            Toast.makeText(NewChallengeActivity.this,
-                    "Error: no network connection.", Toast.LENGTH_LONG).show();
+            imageCondtions.setVisibility(View.INVISIBLE);
+            imageSport.setVisibility(View.INVISIBLE);
+            btnAcceptChallenge.setVisibility(View.INVISIBLE);
+            textChallenge.setVisibility(View.INVISIBLE);
+            imageProgress.setVisibility(View.INVISIBLE);
+            imagePlus.setVisibility(View.INVISIBLE);
+            imageEqual.setVisibility(View.INVISIBLE);
+            Snackbar.make(view, "Tem de estar ligado a internet", Snackbar.LENGTH_SHORT).show();
         }
 
     }
@@ -191,12 +206,16 @@ public class NewChallengeActivity extends AppCompatActivity {
         }
     }
 
-
     private void accessGoogleFit(DataType fieldNormal, DataType fieldAggregate) {
         Calendar cal = Calendar.getInstance();
+        Date date = cal.getTime();
         cal.setTime(new Date());
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
         cal.add(Calendar.HOUR, -currentHour);
+        cal.add(Calendar.DAY_OF_WEEK, -6);
+        Locale pt = new Locale("pt","pt");
+        dayName = new SimpleDateFormat("EEEE", pt).format(date.getTime());
+       // System.out.println("OIIII"+new SimpleDateFormat("EEEE", pt).format(date.getTime()));
         long endTime = cal.getTimeInMillis();
         cal.add(Calendar.DAY_OF_WEEK, -1);
         long startTime = cal.getTimeInMillis();
@@ -216,9 +235,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(NewChallengeActivity.this,
-                        "Error: ",
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(view, "Error: Cant Access google fit history ", Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -232,15 +249,18 @@ public class NewChallengeActivity extends AppCompatActivity {
         cal.setTime(new Date());
         long endTime = cal.getTimeInMillis();
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
+        System.out.println("CURRENT HOUR"+currentHour);
         cal.add(Calendar.HOUR, -currentHour);
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+        System.out.println("CURRENT DAY"+dayOfWeek);
+       // cal.add(Calendar.DAY_OF_WEEK,-1);
         cal.add(Calendar.DAY_OF_WEEK, -dayOfWeek + 2);
         long startTime = cal.getTimeInMillis();
 
         Fitness.getHistoryClient(this, GoogleSignIn.getLastSignedInAccount(this)).readData(
                 new DataReadRequest.Builder()
-                        .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                         .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+                        .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                         .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                         .bucketByTime(1, TimeUnit.DAYS)
                         .build()).
@@ -252,9 +272,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(NewChallengeActivity.this,
-                        "Error: ",
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(view, "Error: Cant Access google fit history ", Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -302,35 +320,6 @@ public class NewChallengeActivity extends AppCompatActivity {
 
     }
 
-    public void getHourActivityLastWeek(DataType fieldNormal, DataType fieldAggregate) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        int currentHour = cal.get(Calendar.HOUR_OF_DAY);
-        cal.add(Calendar.HOUR, -currentHour);
-        cal.add(Calendar.DAY_OF_MONTH, -6);
-        long endTime = cal.getTimeInMillis();
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-        long startTime = cal.getTimeInMillis();
-
-        Fitness.getHistoryClient(this, GoogleSignIn.getLastSignedInAccount(this)).readData(
-                new DataReadRequest.Builder()
-                        .aggregate(fieldNormal, fieldAggregate)
-                        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                        .bucketByTime(1, TimeUnit.HOURS)
-                        .build()).
-                addOnSuccessListener(new OnSuccessListener<DataReadResponse>() {
-                    @Override
-                    public void onSuccess(DataReadResponse dataReadResponse) {
-                        printData(dataReadResponse);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-            /*    Toast.makeText(NewChallengeActivity.this, "Error: ", Toast.LENGTH_LONG).show();*/
-            }
-        });
-    }
-
     public static void getHourActivityLastWeek_2(final Context context) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
@@ -360,13 +349,12 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d("DEBUG", "Error in get history");
+                Snackbar.make(view, "Error: Cant Access google fit history ", Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
     private Boolean checkIfGoalsCompleted() {
-
         for (int i = 0; i < goals.size(); i++) {
             if (goals.get(i).getRecurence() == 1) {
                 float objective = goals.get(i).getValue();
@@ -399,8 +387,6 @@ public class NewChallengeActivity extends AppCompatActivity {
     public static void printData(DataReadResponse dataReadResult) {
 
         if (dataReadResult.getBuckets().size() == 1) {
-            Log.i(
-                    LOG_TAG, "Number of returned buckets of DataSets is: " + dataReadResult.getBuckets().size());
             for (Bucket bucket : dataReadResult.getBuckets()) {
                 List<DataSet> dataSets = bucket.getDataSets();
                 for (DataSet dataSet : dataSets) {
@@ -408,8 +394,6 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
             }
         } else if (dataReadResult.getBuckets().size() > 1) {
-
-            Log.i(LOG_TAG, "Number of returned DataSets is: " + dataReadResult.getDataSets().size());
             for (Bucket bucket : dataReadResult.getBuckets()) {
                 List<DataSet> dataSets = bucket.getDataSets();
                 for (DataSet dataSet : dataSets) {
@@ -429,19 +413,21 @@ public class NewChallengeActivity extends AppCompatActivity {
             List<DataSet> dataSets = bucket.getDataSets();
             for (DataSet dataSet : dataSets) {
                 dumpDataSetForChallenge(dataSet);
+                if (distannceDay == -10){
+                    distannceDay = 0;
+                }
+                if (distanceAllweek == -10){
+                    distanceAllweek = 0;
+                }
             }
         }
         accessGoogleFitGoals();
     }
 
     private static void dumpDataSet(DataSet dataSet) {
-        Log.i(LOG_TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
 
         for (DataPoint dp : dataSet.getDataPoints()) {
-            Log.i(LOG_TAG, "Data point:");
-            Log.i(LOG_TAG, "\tType: " + dp.getDataType().getName());
             for (Field field : dp.getDataType().getFields()) {
-                Log.i(LOG_TAG, "\tField: " + field.getName() + " Value: " + dp.getValue(field));
                 if (field.getName().equals("distance")) {
                     int distanceValue = (int) dp.getValue(field).asFloat();
                     distance = (float) (distanceValue / 1000.0);
@@ -451,19 +437,20 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
             }
         }
-        distanceText.setText("Ontem percocorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
+        if (dayName.matches( "domingo") || dayName.matches( "sabado")){
+            distanceText.setText("No ultimo "+ dayName+ " percorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
+        }
+        distanceText.setText("Na ultima "+ dayName+" percorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
         distanceText.setGravity(Gravity.CENTER);
     }
 
     private static void dumpDataSetForChallenge(DataSet dataSet) {
-        Log.i(LOG_TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
 
         for (DataPoint dp : dataSet.getDataPoints()) {
-            Log.i(LOG_TAG, "Data point:");
-            Log.i(LOG_TAG, "\tType: " + dp.getDataType().getName());
             for (Field field : dp.getDataType().getFields()) {
-                Log.i(LOG_TAG, "\tField: " + field.getName() + " Value: " + dp.getValue(field));
+                System.out.println("ENTREI"+ field.getName());
                 if (field.getName().equals("distance")) {
+                    System.out.println("ENTREI DISTANCE");
                     float distanceValue = dp.getValue(field).asFloat();
                     if (distanceAllweek == -10) {
                         distanceAllweek = distanceValue;
@@ -473,6 +460,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                     distannceDay = distanceValue;
                 }
                 if (field.getName().equals("steps")) {
+                    System.out.println("ENTREI STEPS");
                     int value = dp.getValue(field).asInt();
 
                     if (stepAllweek == -10) {
@@ -488,13 +476,9 @@ public class NewChallengeActivity extends AppCompatActivity {
     }
 
     private static void dumpDataSetForHourActivity(DataSet dataSet) {
-        Log.i(LOG_TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         for (DataPoint dp : dataSet.getDataPoints()) {
 
-            Log.i(LOG_TAG, "Data point:");
-            Log.i(LOG_TAG, "\tType: " + dp.getDataType().getName());
             for (Field field : dp.getDataType().getFields()) {
-                Log.i(LOG_TAG, "\tField: " + field.getName() + " Value: " + dp.getValue(field));
                 if (dp.getValue(field).asFloat() > maxActivity) {
                     maxActivity = dp.getValue(field).asFloat();
                     hourMaxActivity = contHour;
@@ -540,15 +524,16 @@ public class NewChallengeActivity extends AppCompatActivity {
                             //6 significa que esta a chover "rainy", se tiver diferente nao chove
                             if (weather.getConditions()[i] != 6) {
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
-                                tempText.setText("Estao " + String.format("%.2f", temp) + " ºC e não está a chover, deve aproveitar para" +
+                                tempText.setText("Estão " + String.format("%.0f", temp) + " ºC e não está a chover, deve aproveitar para" +
                                         " ir praticar exericio fisico.");
                                 tempText.setGravity(Gravity.CENTER);
                             } else {
+                                isRainning = true;
                                 imageSport.setImageResource(R.drawable.ic_workout);
-                                textChallenge.setText("Aproveite faca desporto em casa");
+                                textChallenge.setText("Aproveite faça desporto em casa");
                                 btnAcceptChallenge.setVisibility(View.INVISIBLE);
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
-                                tempText.setText("Estao " + String.format("%.2f", temp) + " ºC  mas está a chover.");
+                                tempText.setText("Estão " + String.format("%.0f", temp) + " ºC  mas está a chover.");
                                 tempText.setGravity(Gravity.CENTER);
                                 return;
                             }
@@ -558,9 +543,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(NewChallengeActivity.this,
-                                "Error: ",
-                                Toast.LENGTH_LONG).show();
+                        Snackbar.make(view, "Error: Cant Get Weather", Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -576,9 +559,7 @@ public class NewChallengeActivity extends AppCompatActivity {
             int locationMode = Settings.Secure.getInt(getContentResolver(),
                     Settings.Secure.LOCATION_MODE);
             if (locationMode != Settings.Secure.LOCATION_MODE_HIGH_ACCURACY) {
-                Toast.makeText(this,
-                        "Error: high accuracy location mode must be enabled in the device.",
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(view, "Error: high accuracy location mode must be enabled in the device.", Snackbar.LENGTH_SHORT).show();
                 return;
             }
         } catch (Settings.SettingNotFoundException e) {
@@ -621,6 +602,5 @@ public class NewChallengeActivity extends AppCompatActivity {
         i.putExtra("latitude", latitude);
         startActivity(i);
     }
-
 
 }

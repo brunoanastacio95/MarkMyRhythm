@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.provider.Settings;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -264,7 +267,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void newChallengeOnClick(View view) {
-        Intent i = new Intent(MainActivity.this, NewChallengeActivity.class);
-        startActivity(i);
+       if (GoogleSignIn.getLastSignedInAccount(this) != null ) {
+           Intent i = new Intent(MainActivity.this, NewChallengeActivity.class);
+           startActivity(i);
+       }else{
+           Snackbar.make(view, "Tem de estar logado", Snackbar.LENGTH_SHORT).show();
+       }
     }
 }
