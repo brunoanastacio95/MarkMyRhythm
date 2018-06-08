@@ -106,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
         //routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
        // routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
 
+
+
         String text = readFile("short_3.txt");
         routes.add(createRoute(text, 1));
         text = readFile("short_4.txt");
@@ -115,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
         routes.add(createRoute(text, 2));
         text = readFile("short_2.txt");
         routes.add(createRoute(text, 2));
+
+        text = readFile("short_5.txt");
+        routes.add(createRoute(text, 3));
 
         Singleton.getInstance().setRoutes(routes);
     }
