@@ -207,6 +207,7 @@ public class NewChallengeActivity extends AppCompatActivity {
         cal.setTime(new Date());
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
         cal.add(Calendar.HOUR, -currentHour);
+        cal.add(Calendar.DAY_OF_WEEK, -6);
         long endTime = cal.getTimeInMillis();
         cal.add(Calendar.DAY_OF_WEEK, -1);
         long startTime = cal.getTimeInMillis();
@@ -512,15 +513,15 @@ public class NewChallengeActivity extends AppCompatActivity {
                             //6 significa que esta a chover "rainy", se tiver diferente nao chove
                             if (weather.getConditions()[i] != 6) {
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
-                                tempText.setText("Estao " + String.format("%.2f", temp) + " ºC e não está a chover, deve aproveitar para" +
+                                tempText.setText("Estão " + String.format("%.2f", temp) + " ºC e não está a chover, deve aproveitar para" +
                                         " ir praticar exericio fisico.");
                                 tempText.setGravity(Gravity.CENTER);
                             } else {
                                 imageSport.setImageResource(R.drawable.ic_workout);
-                                textChallenge.setText("Aproveite faca desporto em casa");
+                                textChallenge.setText("Aproveite faça desporto em casa");
                                 btnAcceptChallenge.setVisibility(View.INVISIBLE);
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
-                                tempText.setText("Estao " + String.format("%.2f", temp) + " ºC  mas está a chover.");
+                                tempText.setText("Estão " + String.format("%.2f", temp) + " ºC  mas está a chover.");
                                 tempText.setGravity(Gravity.CENTER);
                                 return;
                             }
