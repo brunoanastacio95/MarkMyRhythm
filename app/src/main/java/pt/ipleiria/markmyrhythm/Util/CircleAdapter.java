@@ -75,7 +75,6 @@ public class CircleAdapter extends ArrayAdapter<Goal> {
             holder.circle.setMaxValueAllowed(100);
             holder.text.setTypeface(null, Typeface.BOLD);
             holder.title.setTypeface(null, Typeface.BOLD);
-            holder.current.setText(String.format("%.0f",goals.get(position).getCurrent()));
 
             String recurence = "";
             if (goals.get(position).getRecurence() == 1){
@@ -91,12 +90,14 @@ public class CircleAdapter extends ArrayAdapter<Goal> {
             if (goals.get(position).getDataType().matches("com.google.distance.delta")) {
                 holder.circle.setValue((goals.get(position).getCurrent() / goals.get(position).getValue()) *100 );
                 holder.circle.setMaxValueAllowed(100);
-
                 holder.text.setText("Percorrer " + goals.get(position).getValue() / 1000 + "km " + recurence);
+                float value = goals.get(position).getCurrent() / 1000;
+                holder.current.setText(String.format("%.2f",value)+ "km atualmente");
             }else {
                 holder.circle.setValue((goals.get(position).getCurrent() / goals.get(position).getValue()) *100 );
-                holder.text.setText("Tem de fazer  " + (int) goals.get(position).getValue() + " passos "+ recurence );
+                holder.text.setText("Tem de dar " + (int) goals.get(position).getValue() + " passos "+ recurence );
                 holder.circle.setMaxValueAllowed(100);
+                holder.current.setText(String.format("%.0f",goals.get(position).getCurrent())+ " passos atualmente");
             }
            // holder.circle.setValue(goals.get(position).getValue());
 

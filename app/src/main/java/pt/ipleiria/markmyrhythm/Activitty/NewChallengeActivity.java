@@ -79,6 +79,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLOutput;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -128,6 +129,8 @@ public class NewChallengeActivity extends AppCompatActivity {
     private static int hourMaxActivity;
     private static float maxActivity;
     private static View view;
+    private static String dayName;
+    private boolean isRainning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +158,7 @@ public class NewChallengeActivity extends AppCompatActivity {
         longitude = -1000;
         contHour = 0;
         maxActivity = 0;
+        isRainning = false;
 
         checkFineLocationPermission();
         if (ContextCompat.checkSelfPermission(NewChallengeActivity.this,
@@ -204,10 +208,14 @@ public class NewChallengeActivity extends AppCompatActivity {
 
     private void accessGoogleFit(DataType fieldNormal, DataType fieldAggregate) {
         Calendar cal = Calendar.getInstance();
+        Date date = cal.getTime();
         cal.setTime(new Date());
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
         cal.add(Calendar.HOUR, -currentHour);
         cal.add(Calendar.DAY_OF_WEEK, -6);
+        Locale pt = new Locale("pt","pt");
+        dayName = new SimpleDateFormat("EEEE", pt).format(date.getTime());
+       // System.out.println("OIIII"+new SimpleDateFormat("EEEE", pt).format(date.getTime()));
         long endTime = cal.getTimeInMillis();
         cal.add(Calendar.DAY_OF_WEEK, -1);
         long startTime = cal.getTimeInMillis();
@@ -429,7 +437,10 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
             }
         }
-        distanceText.setText("Ontem percocorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
+        if (dayName.matches( "domingo") || dayName.matches( "sabado")){
+            distanceText.setText("No ultimo "+ dayName+ " percorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
+        }
+        distanceText.setText("Na ultima "+ dayName+" percorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
         distanceText.setGravity(Gravity.CENTER);
     }
 
@@ -513,15 +524,16 @@ public class NewChallengeActivity extends AppCompatActivity {
                             //6 significa que esta a chover "rainy", se tiver diferente nao chove
                             if (weather.getConditions()[i] != 6) {
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
-                                tempText.setText("Estão " + String.format("%.2f", temp) + " ºC e não está a chover, deve aproveitar para" +
+                                tempText.setText("Estão " + String.format("%.0f", temp) + " ºC e não está a chover, deve aproveitar para" +
                                         " ir praticar exericio fisico.");
                                 tempText.setGravity(Gravity.CENTER);
                             } else {
+                                isRainning = true;
                                 imageSport.setImageResource(R.drawable.ic_workout);
                                 textChallenge.setText("Aproveite faça desporto em casa");
                                 btnAcceptChallenge.setVisibility(View.INVISIBLE);
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
-                                tempText.setText("Estão " + String.format("%.2f", temp) + " ºC  mas está a chover.");
+                                tempText.setText("Estão " + String.format("%.0f", temp) + " ºC  mas está a chover.");
                                 tempText.setGravity(Gravity.CENTER);
                                 return;
                             }

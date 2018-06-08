@@ -25,15 +25,21 @@
 
     <Button
         android:id="@+id/buttonShowChallenge"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_width="103dp"
+        android:layout_height="49dp"
         android:layout_marginBottom="8dp"
+
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="9dp"
         android:layout_marginRight="8dp"
+
         android:layout_marginStart="9dp"
+        android:background="@drawable/buttonshape"
         android:onClick="googleMapsOnClick"
-        android:text="Mostrar"
+        android:text="GO!"
+        android:textColor="#FFF0F9"
+        android:textSize="25sp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -51,6 +57,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:text="Temos um percurso perto de ti!"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/buttonShowChallenge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -60,8 +67,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:background="@color/colorPrimaryDark"
-        android:divider="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
+        android:divider="@color/colorPrimary"
         android:dividerHeight="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
