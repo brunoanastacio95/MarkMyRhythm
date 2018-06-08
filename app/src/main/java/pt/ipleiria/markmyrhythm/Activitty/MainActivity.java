@@ -3,6 +3,7 @@ package pt.ipleiria.markmyrhythm.Activitty;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -20,9 +21,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.LinkedList;
 
 import pt.ipleiria.markmyrhythm.Model.Route;
@@ -91,9 +100,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addRoutes() {
-        routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
-        routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
+        //routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
+       // routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
+        String text = readFile("short_1.txt");
+        routes.add(createRoute(text, 1));
+
         Singleton.getInstance().setRoutes(routes);
+    }
+
+    private Route createRoute(String text, int size){
+        String[]lines = text.split(";");
+        String partial = "";
+        String wayPoints = "";
+        String start = "";
+        String end = "";
+
+        String[]auxStart = lines[0].split(",");
+        start = auxStart[1]+","+auxStart[0];
+
+        String[]auxEnd = lines[lines.length-1].split(",");
+        end = auxEnd[1]+","+auxEnd[0];
+
+        for(int i = 1; i < lines.length-1; i++){
+            String[]values = lines[i].split(",");
+            partial = values[1]+ "," +values[0];
+            if(i != 1){
+                wayPoints += "|" + partial;
+            }else{
+                wayPoints += partial;
+            }
+        }
+
+        System.out.println("WAYPOINTS: ");
+        System.out.println(wayPoints);
+        Route r = new Route(start, end, wayPoints, size );
+        return r;
+    }
+
+    private String readFile(String fileName)  {
+        StringBuilder strBuilder = new StringBuilder();
+
+        InputStream fIn = null;
+        InputStreamReader isr = null;
+        BufferedReader input = null;
+        try {
+            fIn = this.getResources().getAssets().open(fileName);
+            isr = new InputStreamReader(fIn);
+            input = new BufferedReader(isr);
+            String line = "";
+            while ((line = input.readLine()) != null) {
+                strBuilder.append(line);
+            }
+        } catch (Exception e) {
+            e.getMessage();
+        } finally {
+            try {
+                if (isr != null)
+                    isr.close();
+                if (fIn != null)
+                    fIn.close();
+                if (input != null)
+                    input.close();
+            } catch (Exception e2) {
+                e2.getMessage();
+            }
+        }
+
+        return strBuilder.toString();
     }
 
     private void signIn() {

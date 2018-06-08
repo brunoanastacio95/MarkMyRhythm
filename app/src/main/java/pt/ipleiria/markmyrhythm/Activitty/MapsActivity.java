@@ -63,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String firstLocation = latitude + "," + longitude;
 
         routes = Singleton.getInstance().getRoutes();
-
+/*
         for (int i = 0;i < routes.size();i++){
             System.out.println("caralo");
             DistanceBetweenTwoPoints distanceBetweenTwoPoints = new DistanceBetweenTwoPoints();
@@ -72,7 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     "&mode=walking&key=AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
 
         }
-
+*/
     }
 
     /**
@@ -89,29 +89,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng myLocation = new LatLng(latitude, longitude);
-        Random r = new Random();
-        float a = (float) 0.2;
-        float ola = (float) (r.nextFloat() * a - 0.1);
-        while ( String.format("%.2f",ola) == "0.00" ||String.format("%.2f",ola) == "-0.00") {
-            ola = r.nextFloat() * 1 - 1;
-        }
-        System.out.println("random"+ ola);
-        LatLng myLocation2 = new LatLng(latitude , longitude + 0.09);
-       checkFineLocationPermission();
+        Route route = routes.get(0);
+        String latString = route.getStart().split(",")[0];
+        Double lat = Double.parseDouble(latString);
+
+        String longString = route.getStart().split(",")[1];
+        Double lon = Double.parseDouble(longString);
+
+        LatLng myLocation = new LatLng(lat, lon);
+        checkFineLocationPermission();
         mMap.setMyLocationEnabled(true);
         //mMap.addMarker(new MarkerOptions().position(myLocation).title("Marker in My Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 13));
         // Zoom in, animating the camera.
         mMap.animateCamera(CameraUpdateFactory.zoomIn());
         // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 2000, null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
 
 
         FetchUrl distanceBetweenTwoPoints = new FetchUrl();
          distanceBetweenTwoPoints.execute("https://maps.googleapis.com/maps/api/directions/json?" +
-              "origin="+39.6010749+","+-8.8128075+"&destination="+39.5986332+","+-8.8158281+
-                 "&waypoints="+39.6002813+","+-8.8151356+"|"+39.6000728+","+-8.8131588+
+              "origin="+route.getStart()+"&destination="+route.getEnd()+
+                 "&waypoints="+route.getWayPoints()+
                  "&avoid=highways&mode=walking&key=" +
                 "AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
 
@@ -264,7 +263,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);
                 lineOptions.width(10);
-                lineOptions.color(Color.RED);
+                lineOptions.color(Color.BLUE);
 
                 Log.d("onPostExecute", "onPostExecute lineoptions decoded");
 

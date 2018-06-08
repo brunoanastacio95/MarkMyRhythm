@@ -4,11 +4,13 @@ public class Route {
     private String start;
     private String end;
     private String wayPoints;
+    private int size;
 
-    public Route(String start, String end, String wayPoints) {
+    public Route(String start, String end, String wayPoints, int size) {
         this.start = start;
         this.end = end;
         this.wayPoints = wayPoints;
+        this.size = size;
     }
 
     public String getStart() {
