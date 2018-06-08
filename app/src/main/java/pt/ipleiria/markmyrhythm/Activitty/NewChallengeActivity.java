@@ -343,7 +343,7 @@ public class NewChallengeActivity extends AppCompatActivity {
 
         DataType fieldNormal = DataType.TYPE_DISTANCE_DELTA;
         DataType fieldAggregate = DataType.AGGREGATE_DISTANCE_DELTA;
-       
+
         Fitness.getHistoryClient(context, GoogleSignIn.getLastSignedInAccount(context)).readData(
                 new DataReadRequest.Builder()
                         .aggregate(fieldNormal, fieldAggregate)
