@@ -40,6 +40,7 @@ import java.util.Random;
 import pt.ipleiria.markmyrhythm.Model.Route;
 import pt.ipleiria.markmyrhythm.Model.Singleton;
 import pt.ipleiria.markmyrhythm.R;
+import pt.ipleiria.markmyrhythm.Util.MapsHelper;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -48,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Double latitude;
     private static final int REQUEST_CODE_FLPERMISSION = 20;
     private LinkedList<Route> routes;
-
+    private Route nearestRoute = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +64,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String firstLocation = latitude + "," + longitude;
 
         routes = Singleton.getInstance().getRoutes();
-/*
+
+        Double lastDistance = 999999.0;
         for (int i = 0;i < routes.size();i++){
-            System.out.println("caralo");
+            String latString = routes.get(i).getStart().split(",")[0];
+            Double lat = Double.parseDouble(latString);
+
+            String longString = routes.get(i).getStart().split(",")[1];
+            Double lon = Double.parseDouble(longString);
+            Double auxDistance = MapsHelper.distance(latitude, lat, longitude, lon);
+            if(lastDistance > auxDistance ){
+                lastDistance = auxDistance;
+                nearestRoute = routes.get(i);
+            }
+        }
+
+        /*
+         System.out.println("caralo");
             DistanceBetweenTwoPoints distanceBetweenTwoPoints = new DistanceBetweenTwoPoints();
             distanceBetweenTwoPoints.execute("https://maps.googleapis.com/maps/api" +
                     "/distancematrix/json?origins=" + firstLocation + "&destinations="+routes.get(i).getStart() +
-                    "&mode=walking&key=AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
+          "&mode=walking&key=AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
+    */
 
-        }
-*/
     }
 
     /**
@@ -89,11 +103,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        Route route = routes.get(0);
-        String latString = route.getStart().split(",")[0];
+
+        String latString = nearestRoute.getStart().split(",")[0];
         Double lat = Double.parseDouble(latString);
 
-        String longString = route.getStart().split(",")[1];
+        String longString = nearestRoute.getStart().split(",")[1];
         Double lon = Double.parseDouble(longString);
 
         LatLng myLocation = new LatLng(lat, lon);
@@ -109,8 +123,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         FetchUrl distanceBetweenTwoPoints = new FetchUrl();
          distanceBetweenTwoPoints.execute("https://maps.googleapis.com/maps/api/directions/json?" +
-              "origin="+route.getStart()+"&destination="+route.getEnd()+
-                 "&waypoints="+route.getWayPoints()+
+              "origin="+nearestRoute.getStart()+"&destination="+nearestRoute.getEnd()+
+                 "&waypoints="+nearestRoute.getWayPoints()+
                  "&avoid=highways&mode=walking&key=" +
                 "AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
 
