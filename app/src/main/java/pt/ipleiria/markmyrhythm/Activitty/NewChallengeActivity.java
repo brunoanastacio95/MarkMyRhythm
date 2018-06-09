@@ -383,7 +383,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                     }
                 })
-                .setTitle("MarkMyRhythm");
+                .setTitle("Running in Leiria");
         AlertDialog d = builder.create();
         d.show();
         return true;
