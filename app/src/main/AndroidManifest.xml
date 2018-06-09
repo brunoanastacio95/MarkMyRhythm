@@ -34,7 +34,9 @@
 
         <activity
             android:name=".Activitty.MapsActivity"
-            android:label="@string/title_activity_maps" />
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait"
+            />
         <activity android:name=".Activitty.Fragment.Fragment2"></activity>
 
         <receiver android:name=".Model.AlarmReceiver" />
