@@ -4,14 +4,24 @@ public class Route {
     private String start;
     private String end;
     private String wayPoints;
+    private String name;
     private int size;
     private int totalDistance = 0;
 
-    public Route(String start, String end, String wayPoints, int size) {
+    public Route(String start, String end, String wayPoints, int size,String name) {
         this.start = start;
         this.end = end;
         this.wayPoints = wayPoints;
         this.size = size;
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 

@@ -109,22 +109,22 @@ public class MainActivity extends AppCompatActivity {
 
 
         String text = readFile("short_3.txt");
-        routes.add(createRoute(text, 1));
+        routes.add(createRoute(text, 1,"trilho 1 "));
         text = readFile("short_4.txt");
-        routes.add(createRoute(text, 1));
+        routes.add(createRoute(text, 1,"trilho 2"));
 
         text = readFile("short_1.txt");
-        routes.add(createRoute(text, 2));
+        routes.add(createRoute(text, 2,"trilho 3"));
         text = readFile("short_2.txt");
-        routes.add(createRoute(text, 2));
+        routes.add(createRoute(text, 2,"trilho 4"));
 
         text = readFile("short_5.txt");
-        routes.add(createRoute(text, 3));
+        routes.add(createRoute(text, 3,"trilho 5"));
 
         Singleton.getInstance().setRoutes(routes);
     }
 
-    private Route createRoute(String text, int size){
+    private Route createRoute(String text, int size,String name){
         String[]lines = text.split(";");
         String partial = "";
         String wayPoints = "";
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println("WAYPOINTS: ");
         System.out.println(wayPoints);
-        Route r = new Route(start, end, wayPoints, size );
+        Route r = new Route(start, end, wayPoints, size,name );
         return r;
     }
 

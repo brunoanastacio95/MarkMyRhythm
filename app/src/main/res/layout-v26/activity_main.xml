@@ -32,7 +32,7 @@
 
         android:layout_marginRight="8dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:autoSizeTextType="uniform"
         android:text="Hello World!"
 
@@ -44,9 +44,9 @@
         android:id="@+id/imgAcct"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginLeft="58dp"
-        android:layout_marginStart="58dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -84,39 +84,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sign_in_button" />
 
-    <Button
-        android:id="@+id/buttonHistory"
-
-        android:layout_width="161dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/holo_green_dark"
-        android:text="History"
-        android:textColor="@android:color/white"
-        android:textColorLink="@android:color/white"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonNewChallenge" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="161dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/dark_blue"
-        android:text="Iniciar"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonHistory" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonNewChallenge"
+        app:srcCompat="@drawable/image" />
 
 
 </android.support.constraint.ConstraintLayout>

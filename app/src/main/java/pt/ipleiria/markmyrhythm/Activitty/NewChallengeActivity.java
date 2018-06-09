@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Fragment;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -132,6 +133,7 @@ public class NewChallengeActivity extends AppCompatActivity {
     private static String dayName;
     private boolean isRainning;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,6 +152,7 @@ public class NewChallengeActivity extends AppCompatActivity {
         textChallenge = findViewById(R.id.textViewChallenge);
         btnAcceptChallenge = findViewById(R.id.buttonShowChallenge);
         view = findViewById(android.R.id.content);
+
 
         goals = new ArrayList<>();
         conditions = new LinkedList<>();
@@ -187,7 +190,19 @@ public class NewChallengeActivity extends AppCompatActivity {
             imageProgress.setVisibility(View.INVISIBLE);
             imagePlus.setVisibility(View.INVISIBLE);
             imageEqual.setVisibility(View.INVISIBLE);
-            Snackbar.make(view, "Tem de estar ligado a internet", Snackbar.LENGTH_SHORT).show();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Não há ligação à internet neste momento")
+                    .setPositiveButton("Tenta outra vez", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = getIntent();
+                            finish();
+                            startActivity(intent);
+                        }
+                    })
+                    .setTitle("Sem ligação à internet");
+            AlertDialog d = builder.create();
+            d.show();
         }
 
     }
@@ -215,7 +230,7 @@ public class NewChallengeActivity extends AppCompatActivity {
         cal.add(Calendar.DAY_OF_WEEK, -6);
         Locale pt = new Locale("pt","pt");
         dayName = new SimpleDateFormat("EEEE", pt).format(date.getTime());
-       // System.out.println("OIIII"+new SimpleDateFormat("EEEE", pt).format(date.getTime()));
+
         long endTime = cal.getTimeInMillis();
         cal.add(Calendar.DAY_OF_WEEK, -1);
         long startTime = cal.getTimeInMillis();
@@ -249,11 +264,8 @@ public class NewChallengeActivity extends AppCompatActivity {
         cal.setTime(new Date());
         long endTime = cal.getTimeInMillis();
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
-        System.out.println("CURRENT HOUR"+currentHour);
         cal.add(Calendar.HOUR, -currentHour);
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        System.out.println("CURRENT DAY"+dayOfWeek);
-       // cal.add(Calendar.DAY_OF_WEEK,-1);
         cal.add(Calendar.DAY_OF_WEEK, -dayOfWeek + 2);
         long startTime = cal.getTimeInMillis();
 
@@ -437,10 +449,12 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
             }
         }
-        if (dayName.matches( "domingo") || dayName.matches( "sabado")){
+
+        if (dayName.equals( "domingo") || dayName.equals( "sábado")){
             distanceText.setText("No ultimo "+ dayName+ " percorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
+        }else {
+            distanceText.setText("Na ultima " + dayName + " percorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
         }
-        distanceText.setText("Na ultima "+ dayName+" percorreu " + String.format("%.2f", distance) + " km e perdeu " + calories + " calorias.");
         distanceText.setGravity(Gravity.CENTER);
     }
 
@@ -448,9 +462,9 @@ public class NewChallengeActivity extends AppCompatActivity {
 
         for (DataPoint dp : dataSet.getDataPoints()) {
             for (Field field : dp.getDataType().getFields()) {
-                System.out.println("ENTREI"+ field.getName());
+
                 if (field.getName().equals("distance")) {
-                    System.out.println("ENTREI DISTANCE");
+
                     float distanceValue = dp.getValue(field).asFloat();
                     if (distanceAllweek == -10) {
                         distanceAllweek = distanceValue;
@@ -460,7 +474,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                     distannceDay = distanceValue;
                 }
                 if (field.getName().equals("steps")) {
-                    System.out.println("ENTREI STEPS");
+
                     int value = dp.getValue(field).asInt();
 
                     if (stepAllweek == -10) {
@@ -483,7 +497,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                     maxActivity = dp.getValue(field).asFloat();
                     hourMaxActivity = contHour;
                 }
-                System.out.println("PUTAS " + dp.getValue(field) + " HORAS " + contHour);
+
             }
         }
     }
@@ -522,6 +536,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                         for (int i = 0; i < conditionsCont; i++) {
                             conditions.add((weather.getConditions()[i]));
                             //6 significa que esta a chover "rainy", se tiver diferente nao chove
+                            System.out.println("weather"+weather.getConditions()[i]);
                             if (weather.getConditions()[i] != 6) {
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
                                 tempText.setText("Estão " + String.format("%.0f", temp) + " ºC e não está a chover, deve aproveitar para" +
@@ -531,11 +546,11 @@ public class NewChallengeActivity extends AppCompatActivity {
                                 isRainning = true;
                                 imageSport.setImageResource(R.drawable.ic_workout);
                                 textChallenge.setText("Aproveite faça desporto em casa");
-                                btnAcceptChallenge.setVisibility(View.INVISIBLE);
+                           //     btnAcceptChallenge.setVisibility(View.INVISIBLE);
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
                                 tempText.setText("Estão " + String.format("%.0f", temp) + " ºC  mas está a chover.");
                                 tempText.setGravity(Gravity.CENTER);
-                                return;
+                               // return;
                             }
                         }
                     }
@@ -575,17 +590,17 @@ public class NewChallengeActivity extends AppCompatActivity {
             case Weather.CONDITION_CLEAR:
                 return R.drawable.ic_sunny_day;
             case Weather.CONDITION_CLOUDY:
-                return R.drawable.ic_sunny_day;
+                return R.drawable.ic_rainny_day;
             case Weather.CONDITION_FOGGY:
                 return R.drawable.ic_sunny_day;
             case Weather.CONDITION_HAZY:
                 return R.drawable.ic_sunny_day;
             case Weather.CONDITION_ICY:
-                return R.drawable.ic_sunny_day;
+                return R.drawable.ic_rainny_day;
             case Weather.CONDITION_RAINY:
                 return R.drawable.ic_rainny_day;
             case Weather.CONDITION_SNOWY:
-                return R.drawable.ic_sunny_day;
+                return R.drawable.ic_rainny_day;
             case Weather.CONDITION_STORMY:
                 return R.drawable.ic_sunny_day;
             case Weather.CONDITION_WINDY:
