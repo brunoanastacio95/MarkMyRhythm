@@ -95,6 +95,7 @@ import java.util.concurrent.TimeoutException;
 
 import pt.ipleiria.markmyrhythm.Model.AlarmReceiver;
 import pt.ipleiria.markmyrhythm.Model.NotificationAlarm;
+import pt.ipleiria.markmyrhythm.Model.Route;
 import pt.ipleiria.markmyrhythm.Model.Singleton;
 import pt.ipleiria.markmyrhythm.Util.CircleAdapter;
 import pt.ipleiria.markmyrhythm.R;
@@ -132,6 +133,7 @@ public class NewChallengeActivity extends AppCompatActivity {
     private static View view;
     private static String dayName;
     private boolean isRainning;
+    private LinkedList<Route> routes;
 
 
     @Override
@@ -162,6 +164,7 @@ public class NewChallengeActivity extends AppCompatActivity {
         contHour = 0;
         maxActivity = 0;
         isRainning = false;
+        routes = Singleton.getInstance().getRoutes();
 
         checkFineLocationPermission();
         if (ContextCompat.checkSelfPermission(NewChallengeActivity.this,
@@ -377,6 +380,13 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
             }
         }
+        LinkedList <Route> finalRoutes = new LinkedList<>();
+        for(int j = 0; j < routes.size() ;j++){
+            if (routes.get(j).getSize() == 3){
+             finalRoutes.add(routes.get(j));
+            }
+        }
+        Singleton.getInstance().setRoutes(finalRoutes);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Hoje ja completou os desafios todos")
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
