@@ -287,12 +287,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-            builder.setMessage("Quer fazer o trilho do IPLEIRIA ?" + "\n " + "Distância: " + nearestRoute.getTotalDistance() + "metros.")
+            builder.setMessage("Quer fazer o " + nearestRoute.getName()+  " ?" + "\n " + "Distância: " + nearestRoute.getTotalDistance() + "metros.")
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                         }
                     })
-                    .setNegativeButton("Nao", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("Não", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
