@@ -83,7 +83,7 @@
             android:background="@color/colorPrimary"
             android:drawableLeft="@drawable/ic_action_new_challenge"
             android:onClick="newChallengeOnClick"
-            android:text="New Challenge"
+            android:text="NOVO DESAFIO"
             android:textColor="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

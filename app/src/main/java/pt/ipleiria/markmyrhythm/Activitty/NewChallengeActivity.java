@@ -370,16 +370,26 @@ public class NewChallengeActivity extends AppCompatActivity {
     }
 
     private Boolean checkIfGoalsCompleted() {
+        float percentCompleteDay = 0;
+        float percentCompleteWeek = 0;
+        Calendar cal = Calendar.getInstance();
+        int day =  cal.get(Calendar.DAY_OF_WEEK);
+
         for (int i = 0; i < goals.size(); i++) {
-            if (goals.get(i).getRecurence() == 1) {
+            System.out.println("day"+goals.get(i).getDataType());
+            if (goals.get(i).getDataType().equals("com.google.distance.delta")) {
                 float objective = goals.get(i).getValue();
                 float current = goals.get(i).getCurrent();
-                float percentComplete = (current / objective) * 100;
-                if (percentComplete < 100) {
-                    return false;
+                if (goals.get(i).getRecurence() == 1) {
+                    percentCompleteDay = (current / objective) * 100;
+                }else {
+                    percentCompleteWeek = (current / objective) * 100;
                 }
             }
         }
+
+        System.out.println("DAY "+day+percentCompleteDay+"   "
+                +percentCompleteWeek);
         LinkedList <Route> finalRoutes = new LinkedList<>();
         for(int j = 0; j < routes.size() ;j++){
             if (routes.get(j).getSize() == 1){
