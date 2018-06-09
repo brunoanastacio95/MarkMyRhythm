@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
         //routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
        // routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
 
-
-
         String text = readFile("route_3.txt");
         routes.add(createRoute(text, 1,"trilho IPLEIRIA"));
         text = readFile("route_4.txt");

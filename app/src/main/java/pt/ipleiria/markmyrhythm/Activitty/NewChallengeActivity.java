@@ -374,6 +374,8 @@ public class NewChallengeActivity extends AppCompatActivity {
         float percentCompleteWeek = 0;
         Calendar cal = Calendar.getInstance();
         int day =  cal.get(Calendar.DAY_OF_WEEK);
+        float accuracy = 0;
+        LinkedList<Route> finalRoutes = new LinkedList<>();
 
         for (int i = 0; i < goals.size(); i++) {
             System.out.println("day"+goals.get(i).getDataType());
@@ -387,16 +389,45 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
             }
         }
+        if (percentCompleteDay > 100){
+            percentCompleteDay = 100;
+        }
+        if (percentCompleteWeek > 100){
+            percentCompleteWeek = 100;
+        }
+        percentCompleteDay = percentCompleteDay/100;
+        percentCompleteWeek = percentCompleteWeek/100;
+        if (day != 8) {
+            float contaFdd = (float) (day-1)/7;
+            System.out.println("DAY CRL "+contaFdd);
+            float aux1 = (percentCompleteWeek /contaFdd);
+            accuracy = (float) (aux1 + percentCompleteDay ) / 2;
+        }
 
-        System.out.println("DAY "+day+percentCompleteDay+"   "
-                +percentCompleteWeek);
-        LinkedList <Route> finalRoutes = new LinkedList<>();
-        for(int j = 0; j < routes.size() ;j++){
-            if (routes.get(j).getSize() == 1){
-             finalRoutes.add(routes.get(j));
+        if (accuracy > 0 && accuracy <0.33){//percurso 3
+            for(int j = 0; j < routes.size() ;j++){
+                if (routes.get(j).getSize() == 3){
+                    finalRoutes.add(routes.get(j));
+                }
+            }
+        }else if (accuracy >= 0.33 && accuracy <0.66 ) {
+            for(int j = 0; j < routes.size() ;j++){
+                if (routes.get(j).getSize() == 2){
+                    finalRoutes.add(routes.get(j));
+                }
+            }
+        }else {
+            for(int j = 0; j < routes.size() ;j++){
+                if (routes.get(j).getSize() == 1){
+                    finalRoutes.add(routes.get(j));
+                }
             }
         }
-        Singleton.getInstance().setRoutes(finalRoutes);
+        System.out.println("day"+ day+"Accuracy "+accuracy+"act day"+percentCompleteDay+"act week"+percentCompleteWeek);
+        if (finalRoutes != null) {
+            Singleton.getInstance().setRoutes(finalRoutes);
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Hoje ja completou os desafios todos")
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
