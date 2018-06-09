@@ -32,10 +32,6 @@ public class Route {
         this.name = name;
     }
 
-    public int getSize() {
-        return size;
-    }
-
     public int getTotalDistance() {
         return totalDistance;
     }
