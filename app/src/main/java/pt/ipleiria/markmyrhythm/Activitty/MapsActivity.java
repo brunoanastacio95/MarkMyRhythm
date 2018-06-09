@@ -2,6 +2,9 @@ package pt.ipleiria.markmyrhythm.Activitty;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -79,15 +83,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-        /*
-         System.out.println("caralo");
-            DistanceBetweenTwoPoints distanceBetweenTwoPoints = new DistanceBetweenTwoPoints();
-            distanceBetweenTwoPoints.execute("https://maps.googleapis.com/maps/api" +
-                    "/distancematrix/json?origins=" + firstLocation + "&destinations="+routes.get(i).getStart() +
-          "&mode=walking&key=AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
-    */
-
     }
+
 
     /**
      * Manipulates the map once available.
@@ -127,7 +124,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                  "&waypoints="+nearestRoute.getWayPoints()+
                  "&avoid=highways&mode=walking&key=" +
                 "AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
-
     }
 
     private void checkFineLocationPermission() {
@@ -165,6 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 // Fetching the data from web service
                 data = downloadUrl(url[0]);
+
                 Log.d("Background Task data", data.toString());
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
@@ -280,7 +277,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 lineOptions.color(Color.BLUE);
 
                 Log.d("onPostExecute", "onPostExecute lineoptions decoded");
-
             }
 
             // Drawing polyline in the Google Map for the i-th route
@@ -289,7 +285,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else {
                 Log.d("onPostExecute", "without Polylines drawn");
             }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+            builder.setMessage("Quer fazer o trilho do IPLEIRIA ?" + "\n " + "Distância: " + nearestRoute.getTotalDistance() + "metros.")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    })
+                    .setNegativeButton("Nao", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setTitle("Running in Leiria");
+            AlertDialog d = builder.create();
+            d.show();
+
         }
+
+
     }
 
     class DataParser {
@@ -299,10 +314,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          */
         public List<List<HashMap<String, String>>> parse(JSONObject jObject) {
 
+            int totalDistanceMeters =  0;
             List<List<HashMap<String, String>>> routes = new ArrayList<>();
             JSONArray jRoutes;
             JSONArray jLegs;
             JSONArray jSteps;
+            JSONObject jDistance;
 
             try {
 
@@ -315,8 +332,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     /** Traversing all legs */
                     for (int j = 0; j < jLegs.length(); j++) {
-                        jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
 
+                        jDistance = ((JSONObject) jLegs.get(j)).getJSONObject("distance");
+                        totalDistanceMeters += jDistance.getInt("value");
+
+                        jSteps = ((JSONObject) jLegs.get(j)).getJSONArray("steps");
                         /** Traversing all steps */
                         for (int k = 0; k < jSteps.length(); k++) {
                             String polyline = "";
@@ -333,8 +353,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         routes.add(path);
                     }
-                }
+                    System.out.println("Distance: " + totalDistanceMeters);
+                    nearestRoute.setTotalDistance(totalDistanceMeters);
 
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (Exception e) {
