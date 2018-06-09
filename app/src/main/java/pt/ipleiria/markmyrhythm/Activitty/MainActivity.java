@@ -108,18 +108,21 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        String text = readFile("short_3.txt");
+        String text = readFile("route_3.txt");
         routes.add(createRoute(text, 1,"trilho IPLEIRIA"));
-        text = readFile("short_4.txt");
+        text = readFile("route_4.txt");
         routes.add(createRoute(text, 1,"trilho do liz"));
 
-        text = readFile("short_1.txt");
+        text = readFile("route_1.txt");
         routes.add(createRoute(text, 2,"trilho do liz médio"));
-        text = readFile("short_2.txt");
+        text = readFile("route_2.txt");
         routes.add(createRoute(text, 2,"trilho da volta"));
 
-        text = readFile("short_5.txt");
+        text = readFile("route_5.txt");
         routes.add(createRoute(text, 3,"trilho dos marrazes"));
+
+        text = readFile("route_6.txt");
+        routes.add(createRoute(text, 3,"trilho dos hospital"));
 
         Singleton.getInstance().setRoutes(routes);
     }

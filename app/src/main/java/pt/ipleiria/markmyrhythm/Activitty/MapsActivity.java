@@ -69,7 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         routes = Singleton.getInstance().getRoutes();
 
-        Double lastDistance = 999999.0;
+        Double lastDistance = 9999999.0;
         for (int i = 0;i < routes.size();i++){
             String latString = routes.get(i).getStart().split(",")[0];
             Double lat = Double.parseDouble(latString);

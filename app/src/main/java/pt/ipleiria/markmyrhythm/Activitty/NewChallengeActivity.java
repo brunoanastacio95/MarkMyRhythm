@@ -382,7 +382,7 @@ public class NewChallengeActivity extends AppCompatActivity {
         }
         LinkedList <Route> finalRoutes = new LinkedList<>();
         for(int j = 0; j < routes.size() ;j++){
-            if (routes.get(j).getSize() == 3){
+            if (routes.get(j).getSize() == 1){
              finalRoutes.add(routes.get(j));
             }
         }
@@ -600,7 +600,7 @@ public class NewChallengeActivity extends AppCompatActivity {
             case Weather.CONDITION_CLEAR:
                 return R.drawable.ic_sunny_day;
             case Weather.CONDITION_CLOUDY:
-                return R.drawable.ic_rainny_day;
+                return R.drawable.ic_sunny_day;
             case Weather.CONDITION_FOGGY:
                 return R.drawable.ic_sunny_day;
             case Weather.CONDITION_HAZY:
