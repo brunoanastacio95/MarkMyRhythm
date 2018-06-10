@@ -98,93 +98,11 @@ public class MainActivity extends AppCompatActivity {
             nameAcct.setText(personName);
             emailAcct.setText(email);
         }
-        addRoutes();
+
 
     }
 
-    private void addRoutes() {
-        //routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
-       // routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
 
-        String text = readFile("route_3.txt");
-        routes.add(createRoute(text, 1,"trilho IPLEIRIA"));
-        text = readFile("route_4.txt");
-        routes.add(createRoute(text, 1,"trilho do liz"));
-
-        text = readFile("route_1.txt");
-        routes.add(createRoute(text, 2,"trilho do liz médio"));
-        text = readFile("route_2.txt");
-        routes.add(createRoute(text, 2,"trilho da volta"));
-
-        text = readFile("route_5.txt");
-        routes.add(createRoute(text, 3,"trilho dos marrazes"));
-
-        text = readFile("route_6.txt");
-        routes.add(createRoute(text, 3,"trilho dos hospital"));
-
-        Singleton.getInstance().setRoutes(routes);
-    }
-
-    private Route createRoute(String text, int size,String name){
-        String[]lines = text.split(";");
-        String partial = "";
-        String wayPoints = "";
-        String start = "";
-        String end = "";
-
-        String[]auxStart = lines[0].split(",");
-        start = auxStart[1]+","+auxStart[0];
-
-        String[]auxEnd = lines[lines.length-1].split(",");
-        end = auxEnd[1]+","+auxEnd[0];
-
-        for(int i = 1; i < lines.length-1; i++){
-            String[]values = lines[i].split(",");
-            partial = values[1]+ "," +values[0];
-            if(i != 1){
-                wayPoints += "|" + partial;
-            }else{
-                wayPoints += partial;
-            }
-        }
-
-        System.out.println("WAYPOINTS: ");
-        System.out.println(wayPoints);
-        Route r = new Route(start, end, wayPoints, size,name );
-        return r;
-    }
-
-    private String readFile(String fileName)  {
-        StringBuilder strBuilder = new StringBuilder();
-
-        InputStream fIn = null;
-        InputStreamReader isr = null;
-        BufferedReader input = null;
-        try {
-            fIn = this.getResources().getAssets().open(fileName);
-            isr = new InputStreamReader(fIn);
-            input = new BufferedReader(isr);
-            String line = "";
-            while ((line = input.readLine()) != null) {
-                strBuilder.append(line);
-            }
-        } catch (Exception e) {
-            e.getMessage();
-        } finally {
-            try {
-                if (isr != null)
-                    isr.close();
-                if (fIn != null)
-                    fIn.close();
-                if (input != null)
-                    input.close();
-            } catch (Exception e2) {
-                e2.getMessage();
-            }
-        }
-
-        return strBuilder.toString();
-    }
 
     private void signIn() {
         if(acct == null) {
@@ -285,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
            Intent i = new Intent(MainActivity.this, NewChallengeActivity.class);
            startActivity(i);
        }else{
-           Snackbar.make(view, "Tem de estar logado", Snackbar.LENGTH_SHORT).show();
+           Snackbar.make(view, "Tem de Iniciar Sessão", Snackbar.LENGTH_SHORT).show();
        }
     }
 }

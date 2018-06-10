@@ -72,6 +72,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -269,7 +270,12 @@ public class NewChallengeActivity extends AppCompatActivity {
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
         cal.add(Calendar.HOUR, -currentHour);
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        cal.add(Calendar.DAY_OF_WEEK, -dayOfWeek + 2);
+        if (dayOfWeek == 1){
+            cal.add(Calendar.DAY_OF_WEEK,-6);
+        }else {
+            cal.add(Calendar.DAY_OF_WEEK, -dayOfWeek + 2);
+        }
+
         long startTime = cal.getTimeInMillis();
 
         Fitness.getHistoryClient(this, GoogleSignIn.getLastSignedInAccount(this)).readData(
@@ -329,7 +335,9 @@ public class NewChallengeActivity extends AppCompatActivity {
                     }
                 }
                 createCircleGoals();
+                addRoutes();
                 checkIfGoalsCompleted();
+
             }
         });
 
@@ -369,16 +377,16 @@ public class NewChallengeActivity extends AppCompatActivity {
         });
     }
 
-    private Boolean checkIfGoalsCompleted() {
-        float percentCompleteDay = 0;
-        float percentCompleteWeek = 0;
+    private void checkIfGoalsCompleted() {
+        float percentCompleteDay = 100;
+        float percentCompleteWeek = 100;
+        float percentStepDay = 100;
         Calendar cal = Calendar.getInstance();
         int day =  cal.get(Calendar.DAY_OF_WEEK);
         float accuracy = 0;
         LinkedList<Route> finalRoutes = new LinkedList<>();
 
         for (int i = 0; i < goals.size(); i++) {
-            System.out.println("day"+goals.get(i).getDataType());
             if (goals.get(i).getDataType().equals("com.google.distance.delta")) {
                 float objective = goals.get(i).getValue();
                 float current = goals.get(i).getCurrent();
@@ -386,6 +394,12 @@ public class NewChallengeActivity extends AppCompatActivity {
                     percentCompleteDay = (current / objective) * 100;
                 }else {
                     percentCompleteWeek = (current / objective) * 100;
+                }
+            }else {
+                float objective = goals.get(i).getValue();
+                float current = goals.get(i).getCurrent();
+                if (goals.get(i).getRecurence() == 1){
+                    percentStepDay = current/objective;
                 }
             }
         }
@@ -397,9 +411,13 @@ public class NewChallengeActivity extends AppCompatActivity {
         }
         percentCompleteDay = percentCompleteDay/100;
         percentCompleteWeek = percentCompleteWeek/100;
-        if (day != 8) {
+        System.out.println("DAY"+day);
+        if (day != 1) {
             float contaFdd = (float) (day-1)/7;
-            System.out.println("DAY CRL "+contaFdd);
+            float aux1 = (percentCompleteWeek /contaFdd);
+            accuracy = (float) (aux1 + percentCompleteDay ) / 2;
+        }else {
+            float contaFdd = (float) 7/7;
             float aux1 = (percentCompleteWeek /contaFdd);
             accuracy = (float) (aux1 + percentCompleteDay ) / 2;
         }
@@ -428,16 +446,100 @@ public class NewChallengeActivity extends AppCompatActivity {
             Singleton.getInstance().setRoutes(finalRoutes);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Hoje ja completou os desafios todos")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                })
-                .setTitle("Running in Leiria");
-        AlertDialog d = builder.create();
-        d.show();
-        return true;
+        if (percentCompleteDay == 1 && percentStepDay >= 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Hoje ja completou os desafios todos")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    })
+                    .setTitle("Running in Leiria");
+            AlertDialog d = builder.create();
+            d.show();
+        }
+
+    }
+
+    private void addRoutes() {
+        //routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
+        // routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
+        routes = new LinkedList<>();
+        String text = readFile("route_3.txt");
+        routes.add(createRoute(text, 1,"trilho IPLEIRIA"));
+        text = readFile("route_4.txt");
+        routes.add(createRoute(text, 1,"trilho do liz"));
+
+        text = readFile("route_1.txt");
+        routes.add(createRoute(text, 2,"trilho do liz médio"));
+        text = readFile("route_2.txt");
+        routes.add(createRoute(text, 2,"trilho da volta"));
+
+        text = readFile("route_5.txt");
+        routes.add(createRoute(text, 3,"trilho dos marrazes"));
+
+        text = readFile("route_6.txt");
+        routes.add(createRoute(text, 3,"trilho dos hospital"));
+
+        Singleton.getInstance().setRoutes(routes);
+    }
+
+    private Route createRoute(String text, int size,String name){
+        String[]lines = text.split(";");
+        String partial = "";
+        String wayPoints = "";
+        String start = "";
+        String end = "";
+
+        String[]auxStart = lines[0].split(",");
+        start = auxStart[1]+","+auxStart[0];
+
+        String[]auxEnd = lines[lines.length-1].split(",");
+        end = auxEnd[1]+","+auxEnd[0];
+
+        for(int i = 1; i < lines.length-1; i++){
+            String[]values = lines[i].split(",");
+            partial = values[1]+ "," +values[0];
+            if(i != 1){
+                wayPoints += "|" + partial;
+            }else{
+                wayPoints += partial;
+            }
+        }
+
+        Route r = new Route(start, end, wayPoints, size,name );
+        return r;
+    }
+
+    private String readFile(String fileName)  {
+        StringBuilder strBuilder = new StringBuilder();
+
+        InputStream fIn = null;
+        InputStreamReader isr = null;
+        BufferedReader input = null;
+        try {
+            fIn = this.getResources().getAssets().open(fileName);
+            isr = new InputStreamReader(fIn);
+            input = new BufferedReader(isr);
+            String line = "";
+            while ((line = input.readLine()) != null) {
+                strBuilder.append(line);
+            }
+        } catch (Exception e) {
+            e.getMessage();
+        } finally {
+            try {
+                if (isr != null)
+                    isr.close();
+                if (fIn != null)
+                    fIn.close();
+                if (input != null)
+                    input.close();
+            } catch (Exception e2) {
+                e2.getMessage();
+            }
+        }
+
+        return strBuilder.toString();
     }
 
     private void createCircleGoals() {
@@ -587,10 +689,10 @@ public class NewChallengeActivity extends AppCompatActivity {
                         for (int i = 0; i < conditionsCont; i++) {
                             conditions.add((weather.getConditions()[i]));
                             //6 significa que esta a chover "rainy", se tiver diferente nao chove
-                            System.out.println("weather"+weather.getConditions()[i]);
+
                             if (weather.getConditions()[i] != 6) {
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
-                                tempText.setText("Estão " + String.format("%.0f", temp) + " ºC e não está a chover, deve aproveitar para" +
+                                tempText.setText("Estão " + String.format("%.0f", temp) + "ºC e não está a chover, deve aproveitar para" +
                                         " ir praticar exericio fisico.");
                                 tempText.setGravity(Gravity.CENTER);
                             } else {
@@ -663,6 +765,7 @@ public class NewChallengeActivity extends AppCompatActivity {
     }
 
     public void googleMapsOnClick(View view) {
+
         Intent i = new Intent(NewChallengeActivity.this, MapsActivity.class);
         i.putExtra("longitude", longitude);
         i.putExtra("latitude", latitude);
