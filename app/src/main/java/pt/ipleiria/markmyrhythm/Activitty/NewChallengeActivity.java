@@ -395,11 +395,11 @@ public class NewChallengeActivity extends AppCompatActivity {
                 if (goals.get(i).getRecurence() == 1) {
                     percentCompleteDay = (current / objective) * 100;
                 }else {
+                    objectiveWeek = objective/1000;
                     percentCompleteWeek = (current / objective) * 100;
                 }
             }else {
                 float objective = goals.get(i).getValue();
-                objectiveWeek = objective/1000;
                 float current = goals.get(i).getCurrent();
                 if (goals.get(i).getRecurence() == 1){
                     percentStepDay = current/objective;
@@ -419,12 +419,13 @@ public class NewChallengeActivity extends AppCompatActivity {
         float weekPercentageToFinish = 1-percentCompleteWeek;
         float X = (weekPercentageToFinish/daysToFinishGoal);
         accuracy = (X - ((X * percentCompleteDay)));
-       // System.out.println("DAYS: " + daysToFinishGoal);
-       // System.out.println("X: " + X);
-       // System.out.println("ACCURACY: " + accuracy); //
-       // System.out.println("OBJECTIVE: " + objectiveWeek); //
+        // System.out.println("DAYS: " + daysToFinishGoal);
+        //  System.out.println("X: " + X);
+        //  System.out.println("ACCURACY: " + accuracy); //
+        //  System.out.println("OBJECTIVE: " + objectiveWeek); //
         float adviseDistance = objectiveWeek*accuracy;
-        System.out.println("AUX: " + adviseDistance); //
+        // System.out.println("AUX: " + adviseDistance); //
+
         if (adviseDistance <= 2){
             for(int j = 0; j < routes.size() ;j++){
                 if (routes.get(j).getSize() == 1){
@@ -447,7 +448,6 @@ public class NewChallengeActivity extends AppCompatActivity {
             }
         }
 
-        System.out.println("day"+ day+"Accuracy "+accuracy+"act day"+percentCompleteDay+"act week"+percentCompleteWeek);
         if (finalRoutes != null) {
             Singleton.getInstance().setRoutes(finalRoutes);
         }
@@ -467,8 +467,6 @@ public class NewChallengeActivity extends AppCompatActivity {
     }
 
     private void addRoutes() {
-        //routes.add(new Route("39.7380986,-8.8257577","fim","a,b,c"));
-        // routes.add(new Route("39.2380986,-8.8257577","fim1","a,b,c"));
         routes = new LinkedList<>();
         String text = readFile("route_3.txt");
         routes.add(createRoute(text, 1,"trilho IPLEIRIA"));

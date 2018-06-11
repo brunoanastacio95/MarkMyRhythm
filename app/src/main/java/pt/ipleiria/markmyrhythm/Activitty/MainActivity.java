@@ -44,7 +44,6 @@ import pt.ipleiria.markmyrhythm.R;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private static final int RC_SIGN_IN = 2;
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
@@ -101,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
 
     private void signIn() {
         if(acct == null) {

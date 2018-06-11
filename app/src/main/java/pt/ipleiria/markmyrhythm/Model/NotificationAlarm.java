@@ -56,14 +56,22 @@ public class NotificationAlarm extends BroadcastReceiver
      */
     public void scheduleAlarm(Context context)
     {
-        System.out.println("SCHEDULE: " + Singleton.getInstance().getLastActivityHour());
-        int hours = 5;
+        System.out.println("NOTIFICATION SCHEDULED: " + Singleton.getInstance().getLastActivityHour());
+        if(Singleton.getInstance().getLastActivityHour() == -1){ // hora inválida
+            return;
+        }
+
+        int hours = Singleton.getInstance().getLastActivityHour() - 1;
+
+        if(hours <= 0){
+            hours = 0;
+        }
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.MILLISECOND, hours*1000);
-       // calendar.add(Calendar.MILLISECOND, 5000); // Hour-DAY
-        // Actual time plus y + hour in milliseconds
-        // long millis = System.currentTimeMillis() + (hours * 1000) ; //* 60 * 60
+
+        calendar.add(Calendar.MILLISECOND, hours*(60*60*1000));
+
         Intent intentAlarm = new Intent(context, NotificationAlarm.class);
         // Get the Alarm Service.
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

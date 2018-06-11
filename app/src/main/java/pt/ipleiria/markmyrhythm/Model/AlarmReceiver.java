@@ -34,8 +34,8 @@ public class AlarmReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent) {
         //Wake up every day
-        this.scheduleAlarm(context, 24);
-        Toast.makeText(context, "ALARM FIRED !!!", Toast.LENGTH_SHORT).show();
+        //this.scheduleAlarm(context, 24);
+        Log.i("DEBUG", "Alarm fired");
         NewChallengeActivity.getHourActivityLastWeek_2(context);
     }
 
@@ -60,20 +60,28 @@ public class AlarmReceiver extends BroadcastReceiver
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
 
-        calendar.add(Calendar.MILLISECOND, 30000);
-       // calendar.add(Calendar.MILLISECOND, 5000); // Hour-DAY
-        // Actual time plus y + hour in milliseconds
-        // long millis = System.currentTimeMillis() + (hours * 1000) ; //* 60 * 60
+        //  System.out.println("TIME: ");
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinutes = calendar.get(Calendar.MINUTE);
+        // System.out.println(currentHour);
+        //  System.out.println(currentMinutes);
 
+        int diffHours = (24-currentHour) + 2;
+        int diffMinutes = 1;//60-currentMinutes;
+        //System.out.println("FALTAM " + diffHours + " HORAS  E " + diffMinutes + " MINUTOS");
+        calendar.add(Calendar.HOUR, diffHours);
+        calendar.add(Calendar.MINUTE, diffMinutes);
+
+       // System.out.println("MILLIS: " + calendar.getTimeInMillis());
+        long millisInterval = hours * (60 * 60 * 1000); ; // 24 Horas
         Intent intentAlarm = new Intent(context, AlarmReceiver.class);
         // Get the Alarm Service.
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if(alarmManager != null){
             // Set the alarm for a particular time.
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 60*1000, PendingIntent.getBroadcast(context, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT) );
-            // alarmManager.set(AlarmManager.RTC_WAKEUP, millis, PendingIntent.getBroadcast(context, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), millisInterval, PendingIntent.getBroadcast(context, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT) );
         }
-        Log.i("Alarm Scheduled", "Alarm Scheduled");
+        Log.i("DEBUG", "Alarm Scheduled");
     }
 
 
