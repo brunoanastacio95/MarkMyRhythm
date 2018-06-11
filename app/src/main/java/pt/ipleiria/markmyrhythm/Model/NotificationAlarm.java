@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+import pt.ipleiria.markmyrhythm.Activitty.MainActivity;
 import pt.ipleiria.markmyrhythm.Activitty.NewChallengeActivity;
 import pt.ipleiria.markmyrhythm.R;
 
@@ -55,7 +56,7 @@ public class NotificationAlarm extends BroadcastReceiver
      */
     public void scheduleAlarm(Context context)
     {
-        System.out.println("FUCKING: " + Singleton.getInstance().getLastActivityHour());
+        System.out.println("SCHEDULE: " + Singleton.getInstance().getLastActivityHour());
         int hours = 5;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -79,13 +80,17 @@ public class NotificationAlarm extends BroadcastReceiver
     public void createNotification(Context context){
         createNotificationChannel(context);
 
+        Intent resultIntent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,resultIntent, 0);
+
         mBuilder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_run)
                 .setContentTitle("Running in Leiria")
                 .setContentText("A semana passada fez exercício às "+ Singleton.getInstance().getLastActivityHour() + " horas faça hoje também.")
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText("A semana passada fez exercício às "+  Singleton.getInstance().getLastActivityHour() + " horas faça hoje também."))
-                .setPriority(NotificationCompat.PRIORITY_MAX);
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setContentIntent(pendingIntent).setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         // notificationId is a unique int for each notification that you must define
