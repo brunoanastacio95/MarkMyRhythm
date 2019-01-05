@@ -122,8 +122,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          distanceBetweenTwoPoints.execute("https://maps.googleapis.com/maps/api/directions/json?" +
               "origin="+nearestRoute.getStart()+"&destination="+nearestRoute.getEnd()+
                  "&waypoints="+nearestRoute.getWayPoints()+
-                 "&avoid=highways&mode=walking&key=" +
-                "AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc");
+                 "&avoid=highways&mode=walking" +
+                 "&key=" +
+                "AIzaSyDwkI3PFysOsI8y6616OPFQLxQnfmdaTXM");
     }
 
     private void checkFineLocationPermission() {

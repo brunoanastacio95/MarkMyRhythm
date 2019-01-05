@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imgAcct;
     private static final int REQUEST_CODE_FLPERMISSION = 20;
     private LinkedList<Route> routes;
+    String aaa="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                //.requestServerAuthCode("724507898057-6liu56iup5mutdlfpkouo8u1sr649jva.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
@@ -152,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
             setGooglePlusButtonText(signInButton,"Terminar Sessão");
             acct = GoogleSignIn.getLastSignedInAccount(this);
 
+
             Singleton.getInstance().setGoogleSignClient(mGoogleSignInClient);
             Singleton.getInstance().setGoogleAccount(acct);
 
@@ -173,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             // Signed in successfully, show authenticated UI.
+            aaa = account.getServerAuthCode();
             // updateUI(account);
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.

@@ -30,7 +30,7 @@
         <!-- place snapshots -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCdAUhha8frWa1Z9gTXgSh5KxqcIWd9NHc" />
+            android:value="AIzaSyDwkI3PFysOsI8y6616OPFQLxQnfmdaTXM" />
 
         <activity
             android:name=".Activitty.MapsActivity"
