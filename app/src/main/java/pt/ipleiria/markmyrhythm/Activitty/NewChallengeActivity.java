@@ -181,7 +181,7 @@ public class NewChallengeActivity extends AppCompatActivity {
             DataType dataTypeDistanceAggregate = DataType.AGGREGATE_DISTANCE_DELTA;
 
             getWeatherOnCurrentLocation();
-            getCoordinatesAndDesc();
+//            getCoordinatesAndDesc();
 
             allowFitnessOptions(dataTypeDistance);
             accessGoogleFit(dataTypeDistance, dataTypeDistanceAggregate);
@@ -454,12 +454,12 @@ public class NewChallengeActivity extends AppCompatActivity {
 
         if (percentCompleteDay == 1 && percentStepDay >= 1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Hoje ja completou os desafios todos")
+            builder.setMessage("Hoje já completou todos os seus desafios")
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                         }
                     })
-                    .setTitle("Running in Leiria");
+                    .setTitle("Let's go running");
             AlertDialog d = builder.create();
             d.show();
         }
@@ -570,7 +570,7 @@ public class NewChallengeActivity extends AppCompatActivity {
                 }
                 contHour++;
             }
-            System.out.println("MAX ACTIVITY: " + maxActivity + " HORAS: " + hourMaxActivity);
+
             Singleton.getInstance().setLastActivityHour(hourMaxActivity);
         }
 
@@ -697,12 +697,12 @@ public class NewChallengeActivity extends AppCompatActivity {
                             if (weather.getConditions()[i] != 6) {
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
                                 tempText.setText("Estão " + String.format("%.0f", temp) + "ºC e não está a chover, deve aproveitar para" +
-                                        " ir praticar exericio fisico.");
+                                        " ir praticar exercício físico.");
                                 tempText.setGravity(Gravity.CENTER);
                             } else {
                                 isRainning = true;
                                 imageSport.setImageResource(R.drawable.ic_workout);
-                                textChallenge.setText("Aproveite faça desporto em casa");
+                                textChallenge.setText("Aproveite faça desporto em casa.");
                            //     btnAcceptChallenge.setVisibility(View.INVISIBLE);
                                 imageCondtions.setImageResource(retrieveConditionImage(conditions.get(i)));
                                 tempText.setText("Estão " + String.format("%.0f", temp) + " ºC  mas está a chover.");

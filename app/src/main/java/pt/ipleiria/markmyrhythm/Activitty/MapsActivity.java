@@ -299,7 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             finish();
                         }
                     })
-                    .setTitle("Running in Leiria");
+                    .setTitle("Let's go running");
             AlertDialog d = builder.create();
             d.show();
 
