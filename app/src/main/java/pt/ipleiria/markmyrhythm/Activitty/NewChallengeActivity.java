@@ -181,7 +181,7 @@ public class NewChallengeActivity extends AppCompatActivity {
             DataType dataTypeDistanceAggregate = DataType.AGGREGATE_DISTANCE_DELTA;
 
             getWeatherOnCurrentLocation();
-//            getCoordinatesAndDesc();
+            getCoordinatesAndDesc();
 
             allowFitnessOptions(dataTypeDistance);
             accessGoogleFit(dataTypeDistance, dataTypeDistanceAggregate);
